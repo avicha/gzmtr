@@ -21,14 +21,14 @@ var Line = function(terminals, name) {
 };
 Line.prototype.init = function() {
     this.terminals.forEach(function(terminal, i, terminals) {
-        terminal.lines.push(name);
+        terminal.lines.push(this.name);
         if (terminals[i + 1]) {
             terminal.neighbours.push(terminals[i + 1]);
         }
         if (terminals[i - 1]) {
             terminal.neighbours.push(terminals[i - 1]);
         }
-    });
+    }.bind(this));
     return this;
 };
 var MTR = function(name) {
@@ -65,22 +65,32 @@ MTR.prototype.search = function(terminal1, terminal2) {
         this.stack.pop();
         return [terminal1];
     } else {
-        var resolutions = [];
+        var routes = [];
         terminal1.neighbours.forEach(function(neighbour) {
             if (!~this.stack.indexOf(neighbour)) {
                 var result = this.search(neighbour, terminal2);
                 if (result.length) {
-                    result.forEach(function(resolution) {
-                        resolutions.push([terminal1].concat(resolution));
+                    result.forEach(function(route) {
+                        routes.push([terminal1].concat(route));
                     }.bind(this));
                 }
             }
         }.bind(this));
         this.stack.pop();
-        return resolutions.sort(function(a, b) {
+        return routes.sort(function(a, b) {
             return a.length - b.length;
         });
     }
+};
+MTR.prototype.printRoutes = function(routes) {
+    routes.forEach(function(route, i) {
+        // console.log('第' + (i + 1) + '种方案：' + route.map(function(terminal) {
+        //     return terminal.name;
+        // }).join('>'));
+        console.log('第' + (i + 1) + '种方案：' + route.map(function(terminal, i) {
+            return terminal.lines.toString();
+        }).join('>'));
+    });
 };
 //一号线
 var line1_T1 = new Terminal('广州东站');
@@ -290,4 +300,5 @@ gzmtr.addLines([line1, line2, line3, line3plus, line4, line5, line6, line8]);
 // gzmtr.intersectWith(line5_T2, line6_T5); //坦尾
 // gzmtr.intersectWith(line5_T9, line6_T15); //区庄
 
-console.log(gzmtr.search(line1_T13, line2_T8));
+var routes = gzmtr.search(line1_T13, line2_T8);
+gzmtr.printRoutes(routes);
