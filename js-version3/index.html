@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>广州地铁线路查询</title>
+    <style type="text/css">
+    body{
+        margin: 0;
+        font-family: Microsoft Yahei;
+        text-align: center;
+    }
+    .op{
+        margin-top: 20px;
+    }
+    .desc{
+        width: 500px;
+        margin: 50px auto;
+        line-height: 1.6em;
+        text-align: left;
+        color: #f00;
+    }
+    </style>
+</head>
+<body>
+    <p>
+        代价树的广度优先搜索-
+        <span class="mtr-name"></span>
+    </p>
+    <div class="start">
+        <label>起点：</label>
+        <select class="line"></select>
+        <select class="terminal"></select>
+    </div>
+    <div class="end">
+        <label>终点：</label>
+        <select class="line"></select>
+        <select class="terminal"></select>
+    </div>
+    <div class="op">
+        <button class="search">搜索最短路径</button>
+    </div>
+    <p class="desc"></p>
+    <p class="result"></p>
+    <script type="text/javascript" src="jquery-2.2.2.min.js"></script>
+    <script type="text/javascript" src="underscore-1.8.3.min.js"></script>
+    <script type="text/javascript" src="gzmtr.js"></script>
+    <script type="text/javascript" src="main.js"></script>
+</body>
+</html>
