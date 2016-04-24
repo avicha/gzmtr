@@ -2,10 +2,23 @@
 <html>
 <head>
     <meta charset="utf-8" />
+    <meta name="viewport" content="initial-scale=1.0,user-scalable=no,maximum-scale=1,width=device-width">
     <title>广州地铁线路查询</title>
+    <style type="text/css">
+    body{
+        margin: 0;
+        font-family: Microsoft Yahei;
+        text-align: center;
+    }
+    #desc{
+        text-align: left;
+        padding: 2em;
+    }
+    </style>
 </head>
 <body>
-    <p>深度优先遍历所有路线</p>
+    <p>从芳村到三元里所有路线，按照途径站点从少到多排序如下：</p>
+    <p id="desc"></p>
     <script type="text/javascript" src="gzmtr.js"></script>
 </body>
 </html>

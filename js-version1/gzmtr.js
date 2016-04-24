@@ -1,25 +1,43 @@
+//数组去重
 Array.prototype.uniq = function() {
-    var res = []; //一个新的临时数组
-    for (var i = 0, l = this.length; i < l; i++) //遍历当前数组
-    {
-        //如果当前数组的第i已经保存进了临时数组，那么跳过，
-        //否则把当前项push到临时数组里面
-        if (!~res.indexOf(this[i])) {
-            res.push(this[i]);
+        var res = []; //一个新的临时数组
+        for (var i = 0, l = this.length; i < l; i++) //遍历当前数组
+        {
+            //如果当前数组的第i已经保存进了临时数组，那么跳过，
+            //否则把当前项push到临时数组里面
+            if (!~res.indexOf(this[i])) {
+                res.push(this[i]);
+            }
         }
+        return res;
     }
-    return res;
-}
+    /**
+     * [Terminal 站点]
+     * @param {[type]} name [站点名称]
+     */
 var Terminal = function(name) {
+    //站点名称
     this.name = name;
+    //邻接站点
     this.neighbours = [];
+    //位于几号线
     this.lines = [];
 };
+/**
+ * [Line 路线]
+ * @param {[type]} terminals [路线包含的站点]
+ * @param {[type]} name      [路线名称]
+ */
 var Line = function(terminals, name) {
     this.terminals = terminals;
     this.name = name;
 };
+/**
+ * [init 初始化路线]
+ * @return {[type]} [description]
+ */
 Line.prototype.init = function() {
+    //设置路线每个站点的路线和邻接站点
     this.terminals.forEach(function(terminal, i, terminals) {
         terminal.lines.push(this.name);
         if (terminals[i + 1]) {
@@ -31,9 +49,15 @@ Line.prototype.init = function() {
     }.bind(this));
     return this;
 };
+/**
+ * [MTR 地铁]
+ * @param {[type]} name [地铁名称]
+ */
 var MTR = function(name) {
     this.name = name;
+    //地铁路线
     this.lines = [];
+    //路线栈
     this.stack = [];
 };
 MTR.prototype.addLine = function(line) {
@@ -46,29 +70,30 @@ MTR.prototype.addLines = function(lines) {
     }.bind(this));
     return this;
 };
-// MTR.prototype.intersectWith = function(terminal1, terminal2) {
-//     terminal1.lines = terminal1.lines.concat(terminal2.lines);
-//     terminal1.lines = terminal1.lines.uniq();
-//     terminal1.neighbours = terminal1.neighbours.concat(terminal2.neighbours);
-//     terminal1.neighbours = terminal1.neighbours.uniq();
-//     terminal2.neighbours.forEach(function(terminal) {
-//         var index = terminal.neighbours.indexOf(terminal2);
-//         terminal.neighbours[index] = terminal1;
-//     });
-//     terminal2 = terminal1;
-//     console.log(line3_T6, terminal2);
-//     return this;
-// };
+/**
+ * [search 搜索从站点1到站点2的所有路线]
+ * @param  {[type]} terminal1 [站点1]
+ * @param  {[type]} terminal2 [站点2]
+ * @return {[array]} routes   [路线集合]
+ */
 MTR.prototype.search = function(terminal1, terminal2) {
+    //从站点1出发遍历
     this.stack.push(terminal1);
+    //如果已经找到站点2，则站点出栈，并返回一条线路，就是起点自己
     if (terminal1 == terminal2) {
         this.stack.pop();
-        return [terminal1];
+        return [
+            [terminal1]
+        ];
     } else {
+        //用来记录所有线路
         var routes = [];
+        //所有路线等于起点的每个邻接站点可以到达站点2的方案合集，分而治之
         terminal1.neighbours.forEach(function(neighbour) {
+            //如果邻接站点不在栈里，相当于不能出现回路
             if (!~this.stack.indexOf(neighbour)) {
                 var result = this.search(neighbour, terminal2);
+                //合并方案
                 if (result.length) {
                     result.forEach(function(route) {
                         routes.push([terminal1].concat(route));
@@ -76,21 +101,27 @@ MTR.prototype.search = function(terminal1, terminal2) {
                 }
             }
         }.bind(this));
+        //找完站点1到站点2的所有路线，退回上一个站点
         this.stack.pop();
-        return routes.sort(function(a, b) {
-            return a.length - b.length;
-        });
+        return routes;
     }
 };
 MTR.prototype.printRoutes = function(routes) {
-    routes.forEach(function(route, i) {
-        // console.log('第' + (i + 1) + '种方案：' + route.map(function(terminal) {
-        //     return terminal.name;
-        // }).join('>'));
-        console.log('第' + (i + 1) + '种方案：' + route.map(function(terminal, i) {
-            return terminal.lines.toString();
-        }).join('>'));
+    var str = '';
+    //按照途径最少站点排序
+    routes.sort(function(a, b) {
+        return a.length - b.length;
     });
+    //输出每条路线的途径站点
+    str = routes.map(function(route, i) {
+        return ('第' + (i + 1) + '种方案：' + route.map(function(terminal) {
+            return terminal.name;
+        }).join('>'));
+        // console.log('第' + (i + 1) + '种方案：' + route.map(function(terminal, i) {
+        //     return terminal.lines.toString();
+        // }).join('>'));
+    }).join('<br/>');
+    return str;
 };
 //一号线
 var line1_T1 = new Terminal('广州东站');
@@ -245,21 +276,21 @@ var line8_T11 = new Terminal('新港东');
 var line8_T12 = new Terminal('琶洲');
 var line8_T13 = new Terminal('万胜围');
 
-
+//一号线站点
 var line1Terminals = [line1_T1, line1_T2, line1_T3, line1_T4, line1_T5, line1_T6, line1_T7, line1_T8, line1_T9, line1_T10, line1_T11, line1_T12, line1_T13, line1_T14, line1_T15, line1_T16];
-
+//二号线站点
 var line2Terminals = [line2_T1, line2_T2, line2_T3, line2_T4, line2_T5, line2_T6, line2_T7, line2_T8, line2_T9, line2_T10, line2_T11, line1_T8, line2_T13, line2_T14, line2_T15, line2_T16, line2_T17, line2_T18, line2_T19, line2_T20, line2_T21, line2_T22, line2_T23, line2_T24];
-
+//三号线站点
 var line3Terminals = [line3_T1, line3_T2, line3_T3, line3_T4, line3_T5, line1_T3, line3_T7, line3_T8, line3_T9, line3_T10, line3_T11, line3_T12, line3_T13, line3_T14, line3_T15, line3_T16];
-
+//三号线站点（北延段）
 var line3plusTerminals = [line3plus_T1, line3plus_T2, line3plus_T3, line2_T1, line3plus_T5, line3plus_T6, line3plus_T7, line3plus_T8, line3plus_T9, line3plus_T10, line1_T1, line3plus_T12, line1_T3];
-
+//四号线站点
 var line4Terminals = [line4_T1, line4_T2, line4_T3, line4_T4, line4_T5, line4_T6, line4_T7, line4_T8, line4_T9, line4_T10, line4_T11, line4_T12, line4_T13, line4_T14, line4_T15, line4_T16];
-
+//五号线站点
 var line5Terminals = [line5_T1, line5_T2, line5_T3, line5_T4, line5_T5, line2_T9, line5_T7, line5_T8, line5_T9, line5_T10, line1_T4, line5_T12, line3_T7, line5_T14, line5_T15, line5_T16, line5_T17, line4_T3, line5_T19, line5_T20, line5_T21, line5_T22, line5_T23, line5_T24];
-
+//六号线站点
 var line6Terminals = [line6_T1, line6_T2, line6_T3, line6_T4, line5_T2, line6_T6, line1_T12, line6_T8, line6_T9, line2_T13, line6_T11, line6_T12, line6_T13, line1_T5, line5_T9, line6_T16, line6_T17, line6_T18, line6_T19, line3plus_T10, line3_T1, line6_T22];
-
+//八号线站点
 var line8Terminals = [line8_T1, line8_T2, line8_T3, line2_T16, line8_T5, line8_T6, line8_T7, line3_T9, line8_T9, line8_T10, line8_T11, line8_T12, line4_T4];
 
 var line1 = new Line(line1Terminals, 'Line1');
@@ -270,35 +301,11 @@ var line4 = new Line(line4Terminals, 'Line4');
 var line5 = new Line(line5Terminals, 'Line5');
 var line6 = new Line(line6Terminals, 'Line6');
 var line8 = new Line(line8Terminals, 'Line8');
-
+//初始化地铁，并添加路线
 var gzmtr = new MTR('广州地铁');
 gzmtr.addLines([line1, line2, line3, line3plus, line4, line5, line6, line8]);
-// //一号线换乘
-// gzmtr.intersectWith(line1_T12, line6_T7); //黄沙
-// gzmtr.intersectWith(line1_T8, line2_T12); //公园前
-// gzmtr.intersectWith(line1_T5, line6_T14); //东山口
-// gzmtr.intersectWith(line1_T4, line5_T11); //杨箕
-// gzmtr.intersectWith(line1_T3, line3_T6); //体育西路
-// gzmtr.intersectWith(line1_T3, line3plus_T13); //体育西路
-// gzmtr.intersectWith(line1_T1, line3plus_T11); //广州东站
-// //二号线换乘
-// gzmtr.intersectWith(line2_T1, line3plus_T4); //嘉禾望岗
-// gzmtr.intersectWith(line2_T9, line5_T6); //广州火车站
-// gzmtr.intersectWith(line2_T13, line6_T10); //海珠广场
-// gzmtr.intersectWith(line2_T16, line8_T4); //昌岗
-// //三号线换乘
-// gzmtr.intersectWith(line3_T1, line6_T21); //天河客运站
-// gzmtr.intersectWith(line3_T6, line3plus_T13); //体育西路
-// gzmtr.intersectWith(line3_T7, line5_T13); //珠江新城
-// gzmtr.intersectWith(line3_T9, line8_T8); //客村
-// //三号线（北延线）
-// gzmtr.intersectWith(line3plus_T10, line6_T20); //燕塘
-// //四号线换乘
-// gzmtr.intersectWith(line4_T3, line5_T18); //车陂南
-// gzmtr.intersectWith(line4_T4, line8_T13); //万胜围
-// //五号线换乘
-// gzmtr.intersectWith(line5_T2, line6_T5); //坦尾
-// gzmtr.intersectWith(line5_T9, line6_T15); //区庄
-
+//查询芳村到达三元里的所有线路
 var routes = gzmtr.search(line1_T13, line2_T8);
-gzmtr.printRoutes(routes);
+//输出所有线路搜索结果
+var desc = gzmtr.printRoutes(routes);
+document.getElementById('desc').innerHTML = desc;
