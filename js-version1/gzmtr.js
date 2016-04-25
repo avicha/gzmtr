@@ -1,20 +1,20 @@
 //数组去重
 Array.prototype.uniq = function() {
-        var res = []; //一个新的临时数组
-        for (var i = 0, l = this.length; i < l; i++) //遍历当前数组
-        {
-            //如果当前数组的第i已经保存进了临时数组，那么跳过，
-            //否则把当前项push到临时数组里面
-            if (!~res.indexOf(this[i])) {
-                res.push(this[i]);
-            }
+    var res = []; //一个新的临时数组
+    for (var i = 0, l = this.length; i < l; i++) //遍历当前数组
+    {
+        //如果当前数组的第i已经保存进了临时数组，那么跳过，
+        //否则把当前项push到临时数组里面
+        if (!~res.indexOf(this[i])) {
+            res.push(this[i]);
         }
-        return res;
     }
-    /**
-     * [Terminal 站点]
-     * @param {[type]} name [站点名称]
-     */
+    return res;
+};
+/**
+ * [Terminal 站点]
+ * @param {[type]} name [站点名称]
+ */
 var Terminal = function(name) {
     //站点名称
     this.name = name;
